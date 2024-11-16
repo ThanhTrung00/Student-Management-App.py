@@ -29,10 +29,8 @@
                 <input type="number" class="form-control" name="age" id="age" required>
             </div>
             
-            <!-- Cập nhật phần Giới tính thành radio buttons -->
             <div class="form-group col-md-2">
                 <label for="gender">Giới tính:</label><br>
-                <!-- Cập nhật lại CSS cho radio buttons để chúng gần nhau hơn -->
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="gender" id="gender_male" value="Nam" required>
                     <label class="form-check-label" for="gender_male">Nam</label>
@@ -103,15 +101,14 @@ function editStudent(id, name, age, gender, major) {
     document.getElementById('age').value = age;
     document.getElementById('major').value = major;
 
-    // Set selected gender based on the stored value
     if (gender === 'Nam') {
         document.getElementById('gender_male').checked = true;
     } else if (gender === 'Nữ') {
         document.getElementById('gender_female').checked = true;
     }
 
-    document.getElementById('update_button').style.display = 'inline';  // Hiện nút Cập nhật
-    document.getElementsByName('action')[0].value = 'update';  // Đặt hành động là 'update'
+    document.getElementById('update_button').style.display = 'inline';
+    document.getElementsByName('action')[0].value = 'update';
 }
 </script>
 </body>
