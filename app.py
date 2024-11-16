@@ -2,9 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 import psycopg2
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # Dùng secret_key để quản lý session
+app.secret_key = 'your_secret_key' 
 
-# Cấu hình kết nối database
 DB_CONFIG = {
     'dbname': 'students',
     'host': 'localhost',
@@ -13,7 +12,6 @@ DB_CONFIG = {
     'password': 'Tinny987654321'
 }
 
-# Hàm kết nối cơ sở dữ liệu
 def get_db_connection(username, password):
     try:
         conn = psycopg2.connect(
@@ -48,7 +46,6 @@ def register():
         username = request.form['username']
         password = request.form['password']
         
-        # Kết nối cơ sở dữ liệu
         conn = get_db_connection(session.get('username'), session.get('password'))
         if conn is None:
             flash("Không thể kết nối tới cơ sở dữ liệu", "danger")
@@ -56,13 +53,11 @@ def register():
 
         cur = conn.cursor()
         try:
-            # Kiểm tra xem username đã tồn tại chưa
             cur.execute("SELECT * FROM users WHERE username = %s", (username,))
             existing_user = cur.fetchone()
             if existing_user:
                 flash("Tên đăng nhập đã tồn tại!", "danger")
             else:
-                # Thêm người dùng mới vào bảng
                 cur.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, password))
                 conn.commit()
                 flash("Đăng ký thành công! Bạn có thể đăng nhập ngay.", "success")
@@ -81,7 +76,6 @@ def forgot_password():
     if request.method == 'POST':
         username = request.form['username']
         
-        # Kiểm tra nếu người dùng có trong hệ thống
         conn = get_db_connection(session.get('username'), session.get('password'))
         if conn is None:
             flash("Không thể kết nối tới cơ sở dữ liệu", "danger")
@@ -89,12 +83,10 @@ def forgot_password():
 
         cur = conn.cursor()
         try:
-            # Kiểm tra nếu username tồn tại
             cur.execute("SELECT * FROM users WHERE username = %s", (username,))
             user = cur.fetchone()
 
             if user:
-                # Nếu người dùng tồn tại, bạn có thể gửi email reset mật khẩu
                 flash("Nếu tài khoản tồn tại, chúng tôi đã gửi email hướng dẫn đến bạn.", "info")
             else:
                 flash("Tài khoản không tồn tại!", "danger")
@@ -130,7 +122,7 @@ def student_management():
         cur = conn.cursor()
         try:
             if action == 'add':
-                if name:  # Kiểm tra nếu tên không rỗng
+                if name:
                     cur.execute(
                         "INSERT INTO students (name, age, gender, major) VALUES (%s, %s, %s, %s)",
                         (name, age, gender, major)
@@ -140,7 +132,7 @@ def student_management():
                     flash("Tên sinh viên không được để trống!", "danger")
 
             elif action == 'update':
-                if student_id and name:  # Kiểm tra nếu ID và tên không rỗng
+                if student_id and name:
                     cur.execute(
                         "UPDATE students SET name=%s, age=%s, gender=%s, major=%s WHERE id=%s",
                         (name, age, gender, major, student_id)
@@ -150,7 +142,7 @@ def student_management():
                     flash("ID sinh viên và tên không được để trống!", "danger")
 
             elif action == 'delete':
-                if student_id:  # Kiểm tra nếu ID không rỗng
+                if student_id:
                     cur.execute("DELETE FROM students WHERE id=%s", (student_id,))
                     flash("Sinh viên đã được xóa!", "success")
                 else:
@@ -158,12 +150,11 @@ def student_management():
 
             conn.commit()
         except Exception as e:
-            conn.rollback()  # Quay lại nếu có lỗi
+            conn.rollback() 
             flash(f"Đã xảy ra lỗi: {str(e)}", "danger")
         finally:
             cur.close()
 
-    # Load danh sách sinh viên
     cur = conn.cursor()
     cur.execute("SELECT * FROM students")
     students = cur.fetchall()
